@@ -12,10 +12,10 @@ from bert4keras.snippets import open
 from keras.layers import Lambda, Dense
 
 maxlen = 128
-batch_size = 32
-config_path = '/root/kg/bert/chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_config.json'
-checkpoint_path = '/root/kg/bert/chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_model.ckpt'
-dict_path = '/root/kg/bert/chinese_roberta_wwm_ext_L-12_H-768_A-12/vocab.txt'
+batch_size = 2 # 32
+config_path = './model/chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_config.json'
+checkpoint_path = './model/chinese_roberta_wwm_ext_L-12_H-768_A-12/bert_model.ckpt'
+dict_path = './model/chinese_roberta_wwm_ext_L-12_H-768_A-12/vocab.txt'
 
 
 def load_data(filename):
@@ -28,9 +28,9 @@ def load_data(filename):
 
 
 # 加载数据集
-train_data = load_data('datasets/sentiment/sentiment.train.data')
-valid_data = load_data('datasets/sentiment/sentiment.valid.data')
-test_data = load_data('datasets/sentiment/sentiment.test.data')
+train_data = load_data('data/sentiment/sentiment.train.data')
+valid_data = load_data('data/sentiment/sentiment.valid.data')
+test_data = load_data('data/sentiment/sentiment.test.data')
 
 # 模拟标注和非标注数据
 train_frac = 0.01  # 标注数据的比例
@@ -102,7 +102,7 @@ class data_generator(DataGenerator):
                 yield [
                     batch_token_ids, batch_segment_ids, batch_output_ids
                 ], None
-                batch_token_ids, batch_segment_ids, batch_output_ids = [], [], []
+                batch_token_ids, batch_segment_ids, batch_output_ids = [], [], [] # output_ids 是将mask变为了真的id最后再求交叉商
 
 
 class CrossEntropy(Loss):
@@ -172,6 +172,9 @@ train_generator = data_generator(train_data, batch_size)
 valid_generator = data_generator(valid_data, batch_size)
 test_generator = data_generator(test_data, batch_size)
 
+for i in train_generator.__iter__():
+	print(i)
+	break
 
 class Evaluator(keras.callbacks.Callback):
     def __init__(self):
